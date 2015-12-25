@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hosts>
+    <host>
+        <ip_address></ip_address>
+        <!-- Optional, default value is 22 -->
+        <!-- <port></port> -->
+        <username></username>
+        <password></password>
+        <!-- Optional, default value is 5 -->
+        <!--<timeout></timeout>-->
+    </host>
+</hosts>

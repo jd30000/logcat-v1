@@ -1,0 +1,4 @@
+ecdsa==0.13
+paramiko==1.15.3
+py2exe==0.6.9
+pycrypto==2.6
