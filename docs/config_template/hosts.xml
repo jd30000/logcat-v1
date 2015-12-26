@@ -7,6 +7,13 @@
         <username></username>
         <password></password>
         <!-- Optional, default value is 5 -->
-        <!--<timeout></timeout>-->
+        <!-- <timeout></timeout> -->
+		<!-- Optional -->
+		<!--
+		<props>
+			<prop name="k1" value="v1" />
+			<prop name="k2">v2</prop>
+		</props>
+		-->
     </host>
 </hosts>
