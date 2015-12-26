@@ -1,1 +1,15 @@
-#utpp-logcat
+#logcat v1
+
+A tool to execute command at remote hosts.
+
+C:\{PROJECT_DIR}\> python main.py
+Usage: main.py APP_ID(Default|your_app_id) WORKING_DIRECTORY COMMAND \[OUTPUT\(Console|FILE_PATH\) LINE_SIZE\]
+
+Examples:
+    1. Output to console
+        python main.py "Default" "/" "ls -lrt"
+        python main.py "Default" "/" "ls -lrt" Console
+    2. Output to text file
+        python main.py "Default" "/" "ls -lrt" "res/sysout.txt"
+    3. Limit the line size
+        python main.py "Default" "/" "ls -lrt" Console 20
