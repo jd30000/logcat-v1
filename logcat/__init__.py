@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from commons.config import HostConfigLoader
+from commons.config import HostConfigLoader, InvalidConfigException
 from commons.lang import StringUtils
 from logcat import LogCat
 import os
+import re
 import sys
 import time
 
@@ -43,7 +44,7 @@ def main():
     if StringUtils.is_blank(cmd):
         print('The value of COMMAND can\'t be blank!')
         return -1
-    cmd = cmd.strip()
+    cmd = _decode_argv(cmd.strip())
     # Check output file
     output_file = None
     if len(argv) > 3:
@@ -72,10 +73,21 @@ def main():
         os.renames(output_file, backup_file)
         print('The output file specified already exists, rename it to "%s"!' % backup_file)
     # Load the configuration file for hosts
-    host_config_loader = HostConfigLoader(config_file)
+    try:
+        host_config_loader = HostConfigLoader(config_file)
+    except InvalidConfigException as e:
+        print('The configuration is invalid: %s' % e.message)
+        return -1
     host_configs = host_config_loader.get_host_configs()
     for host_config in host_configs:
         log_cat = LogCat(host_config)
         print('Execute command \'%s\' in path \'%s\' at server %s...' % (cmd, wk_dir, host_config.get_ip_address()))
         log_cat.exec_cmd(wk_dir, cmd, output_file, size)
     return 0
+
+
+def _decode_argv(s):
+    # Chinese Simplified
+    if re.match('[\u4e00-\u9fa5]', s):
+        return s.decode('gb2312')
+    return s

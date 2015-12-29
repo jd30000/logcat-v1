@@ -4,6 +4,7 @@
 from abc import ABCMeta, abstractmethod
 import paramiko
 from paramiko.ssh_exception import SSHException
+import socket
 
 
 class CommandExecutor(object):
@@ -21,10 +22,8 @@ class CommandExecutor(object):
         try:
             ssh_client = self.__get_ssh_client()
             self.__exec_command(ssh_client, args)
-        except SSHException as e:
-            print('Failed to execute the command "%s" at host %s, Exception: %s' % (args['cmd'],
-                                                                                    self._ip_address,
-                                                                                    e.message))
+        except (socket.timeout, socket.error, SSHException) as e:
+            print('Failed to execute the command "%s" at host %s, Exception: %s' % (args['cmd'], self._ip_address, e))
         finally:
             if ssh_client is not None:
                 ssh_client.close()
@@ -38,13 +37,13 @@ class CommandExecutor(object):
                 for index in range(0, len(cmds)):
                     args = {'cmd': cmds[index], 'cmd_callback': cmd_callbacks[index]}
                     self.__exec_command(ssh_client, args)
-            except SSHException as e:
+            except (socket.timeout, socket.error, SSHException) as e:
                 if args['cmd'] is None:
-                    print('Failed to connect host %s, Exception: %s' % (self._ip_address, e.message))
+                    print('Failed to connect host %s, Exception: %s' % (self._ip_address, e))
                 else:
                     print('Failed to execute the command "%s" at host %s, Exception: %s' % (args['cmd'],
                                                                                             self._ip_address,
-                                                                                            e.message))
+                                                                                            e))
             finally:
                 if ssh_client is not None:
                     ssh_client.close()
