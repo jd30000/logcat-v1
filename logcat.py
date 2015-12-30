@@ -5,4 +5,4 @@ import sys
 import logcat
 
 if __name__ == '__main__':
-    sys.exit(logcat.main())
+    sys.exit(logcat.logcat())

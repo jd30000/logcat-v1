@@ -43,19 +43,17 @@ class LogCat(object):
         print(self.__format_log_results(lines))
 
     def exec_cmd(self, pwd, cmd, output_file, size):
-        if (pwd is None) or (len(pwd.strip()) == 0):
-            pwd = '~'
-        else:
-            pwd = pwd.strip()
-        if (cmd is None) or (len(cmd.strip()) == 0):
-            raise ValueError('The command to be executed can\'t be None or blank!')
-        else:
+        if (cmd is not None) and (len(cmd.strip()) > 0):
             cmd = cmd.strip()
+        else:
+            raise ValueError('The command to be executed can\'t be None or blank!')
         if output_file is not None:
             output_file = output_file.strip()
             if len(output_file) == 0:
                 raise ValueError('The path of output_file can\'t be blank!')
-        cmd = ('cd ' + pwd + '; ' + cmd)
+        if (pwd is not None) and (len(pwd.strip()) > 0):
+            pwd = pwd.strip()
+            cmd = ('cd ' + pwd + '; ' + cmd)
         lines = []
         self._cmd_executor.exec_command(cmd, LogCatCommandCallback(lines, size))
         if output_file is None:

@@ -11,7 +11,7 @@ import sys
 import time
 
 
-def main():
+def logcat():
     file_name = os.path.basename(sys.argv[0])
     argv = sys.argv[1:]
     # Print usage
@@ -83,6 +83,10 @@ def main():
         log_cat = LogCat(host_config)
         print('Execute command \'%s\' in path \'%s\' at server %s...' % (cmd, wk_dir, host_config.get_ip_address()))
         log_cat.exec_cmd(wk_dir, cmd, output_file, size)
+    return 0
+
+
+def busybox():
     return 0
 
 
