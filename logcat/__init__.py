@@ -87,7 +87,12 @@ def main():
 
 
 def _decode_argv(s):
-    # Chinese Simplified
-    if re.match('[\u4e00-\u9fa5]', s):
-        return s.decode('gb2312')
+    if sys.getdefaultencoding() == 'ascii':
+        # Chinese Simplified (GB2312/GBK/gb18030)
+        if re.search('[\\xa1-\\xfe]{2}', s):
+            return s.decode('gb2312')
+        elif re.search('[\\x40-\\x7e\\x80-\\xfe][\\x81-\\xfe]', s):
+            return s.decode('gbk')
+        elif re.search('([\\x81-\\xfe][\\x30-\\x39]){2}', s):
+            return s.decode('gb18030')
     return s
