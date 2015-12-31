@@ -9,7 +9,7 @@ class LogCat(object):
 
     def __init__(self, host_config):
         if host_config is None:
-            raise ValueError('host_config can\'t be None!')
+            raise ValueError('host_config can\'t be None.')
         else:
             self._host_config = host_config
             ip_address = host_config.get_ip_address()
@@ -42,15 +42,15 @@ class LogCat(object):
     def __print_to_console(self, lines):
         print(self.__format_log_results(lines))
 
-    def exec_cmd(self, pwd, cmd, output_file, size):
+    def exec_cmd(self, pwd, cmd, output_file=None, size=None):
         if (cmd is not None) and (len(cmd.strip()) > 0):
             cmd = cmd.strip()
         else:
-            raise ValueError('The command to be executed can\'t be None or blank!')
+            raise ValueError('The command to be executed can\'t be None or blank.')
         if output_file is not None:
             output_file = output_file.strip()
             if len(output_file) == 0:
-                raise ValueError('The path of output_file can\'t be blank!')
+                raise ValueError('The path of output_file can\'t be blank.')
         if (pwd is not None) and (len(pwd.strip()) > 0):
             pwd = pwd.strip()
             cmd = ('cd ' + pwd + '; ' + cmd)
@@ -66,7 +66,7 @@ class LogCatCommandCallback(CommandCallback):
 
     def __init__(self, lines, size):
         if lines is None:
-            raise ValueError('lines reference can\'t be None!')
+            raise ValueError('lines reference can\'t be None.')
         self._lines = lines
         self._size = size
 

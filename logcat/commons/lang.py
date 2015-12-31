@@ -14,7 +14,11 @@ class StringUtils(object):
 
     @staticmethod
     def is_blank(s):
-        return (s is None) or (len(s) == 0) or (len(s.strip()) == 0)
+        return (s is None) or (len(s.strip()) == 0)
+
+    @staticmethod
+    def is_not_blank(s):
+        return not StringUtils.is_blank(s)
 
     @staticmethod
     def is_not_blank(s):

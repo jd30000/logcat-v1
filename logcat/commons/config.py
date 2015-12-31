@@ -103,19 +103,19 @@ class HostConfigLoader:
                     and hasattr(ip_address_elements[0].childNodes[0], 'data'):
                 ip_address = ip_address_elements[0].childNodes[0].data
                 if len(ip_address.strip()) == 0:
-                    raise InvalidConfigException('The value of ip_address can\'t be blank!')
+                    raise InvalidConfigException('The value of ip_address can\'t be blank.')
                 host_config.set_ip_address(ip_address.strip())
             else:
-                raise InvalidConfigException('ip_address must be specified!')
+                raise InvalidConfigException('ip_address must be specified.')
             # port
             port_elements = host.getElementsByTagName('port')
             if (len(port_elements) > 0) and (len(port_elements[0].childNodes) > 0) \
                     and hasattr(port_elements[0].childNodes[0], 'data'):
                 port = port_elements[0].childNodes[0].data
                 if len(port.strip()) == 0:
-                    raise InvalidConfigException('The value of port can\'t be blank!')
+                    raise InvalidConfigException('The value of port can\'t be blank.')
                 elif re.match('^[1-9][0-9]*$', port.strip()) is None:
-                    raise InvalidConfigException('The value of port must be a number!')
+                    raise InvalidConfigException('The value of port must be a number.')
                 host_config.set_port(int(port.strip()))
             # username
             username_elements = host.getElementsByTagName('username')
@@ -123,29 +123,29 @@ class HostConfigLoader:
                     and hasattr(username_elements[0].childNodes[0], 'data'):
                 username = username_elements[0].childNodes[0].data
                 if len(username.strip()) == 0:
-                    raise InvalidConfigException('The value of username can\'t be blank!')
+                    raise InvalidConfigException('The value of username can\'t be blank.')
                 host_config.set_username(username.strip())
             else:
-                raise InvalidConfigException('username must be specified!')
+                raise InvalidConfigException('username must be specified.')
             # password
             password_elements = host.getElementsByTagName('password')
             if (len(password_elements) > 0) and (len(password_elements[0].childNodes) > 0) \
                     and hasattr(password_elements[0].childNodes[0], 'data'):
                 password = password_elements[0].childNodes[0].data
                 if len(password.strip()) == 0:
-                    raise InvalidConfigException('The value of password can\'t be blank!')
+                    raise InvalidConfigException('The value of password can\'t be blank.')
                 host_config.set_password(password.strip())
             else:
-                raise InvalidConfigException('password must be specified!')
+                raise InvalidConfigException('password must be specified.')
             # timeout
             timeout_elements = host.getElementsByTagName('timeout')
             if (len(timeout_elements) > 0) and (len(timeout_elements[0].childNodes) > 0) \
                     and hasattr(timeout_elements[0].childNodes[0], 'data'):
                 timeout = timeout_elements[0].childNodes[0].data
                 if len(timeout.strip()) == 0:
-                    raise InvalidConfigException('The value of timeout can\'t be blank!')
+                    raise InvalidConfigException('The value of timeout can\'t be blank.')
                 elif re.match('^[0-9]+(\\.[0-9]+)?$', timeout.strip()) is None:
-                    raise InvalidConfigException('The value of port must be a float!')
+                    raise InvalidConfigException('The value of port must be a float.')
                 host_config.set_timeout(float(timeout.strip()))
             # props
             props_elements = host.getElementsByTagName('props')
@@ -154,12 +154,12 @@ class HostConfigLoader:
                 for prop in prop_elements:
                     name = prop.getAttribute('name')
                     if (name is None) or (len(name) == 0):
-                        raise InvalidConfigException('The name of prop must be specified!')
+                        raise InvalidConfigException('The name of prop must be specified.')
                     if (len(prop.childNodes) > 0) and hasattr(prop.childNodes[0], 'data'):
                         value = prop.childNodes[0].data
                     elif prop.hasAttribute('value'):
                         value = prop.getAttribute('value')
                     else:
-                        raise InvalidConfigException('The value of prop "%s" must be specified!' % name)
+                        raise InvalidConfigException('The value of prop "%s" must be specified.' % name)
                     host_config.put_prop(name, value)
             self._host_configs.append(host_config)

@@ -105,7 +105,7 @@ class CommandCallbackChain(CommandCallback):
             else:
                 raise TypeError(
                     'next_command_callback must be instance of logcat.commons.ssh.CommandCallback '
-                    'or logcat.commons.ssh.CommandCallbackChain!')
+                    'or logcat.commons.ssh.CommandCallbackChain.')
 
     def has_next(self):
         return self._next_command is not None
