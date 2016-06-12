@@ -5,7 +5,7 @@ from commons.ssh import CommandExecutor, CommandCallback
 import codecs
 
 
-class LogCat(object):
+class Logcat(object):
 
     def __init__(self, host_config):
         if host_config is None:
@@ -55,14 +55,14 @@ class LogCat(object):
             pwd = pwd.strip()
             cmd = ('cd ' + pwd + '; ' + cmd)
         lines = []
-        self._cmd_executor.exec_command(cmd, LogCatCommandCallback(lines, size))
+        self._cmd_executor.exec_command(cmd, LogcatCommandCallback(lines, size))
         if output_file is None:
             self.__print_to_console(lines)
         else:
             self.__write_to_file(lines, output_file)
 
 
-class LogCatCommandCallback(CommandCallback):
+class LogcatCommandCallback(CommandCallback):
 
     def __init__(self, lines, size):
         if lines is None:
@@ -70,14 +70,21 @@ class LogCatCommandCallback(CommandCallback):
         self._lines = lines
         self._size = size
 
-    def __is_continuous(self):
-        if self._size is not None:
-            return len(self._lines) < self._size
-        return True
-
     def handle(self, stdin, stdout, stderr):
-        while self.__is_continuous():
-            line = stdout.readline()
-            if len(line) <= 0:
-                break
-            self._lines.append(line)
+        if (self._size is None) or (self._size > 0) or (self._size < 0):
+            buf = []
+            try:
+                while True:
+                    line = stdout.readline()
+                    if len(line) == 0:
+                        break
+                    buf.append(line)
+            finally:
+                stdout.close()
+            if (self._size is not None) and (len(buf) > abs(self._size)):
+                if self._size > 0:
+                    buf = buf[:self._size]
+                else:
+                    buf = buf[len(buf) - abs(self._size):]
+            for line in buf:
+                self._lines.append(line)

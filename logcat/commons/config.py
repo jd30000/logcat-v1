@@ -93,6 +93,65 @@ class HostConfigLoader:
     def __load(self):
         dom = xml.dom.minidom.parse(self._path)
         root = dom.documentElement
+        # globals
+        globals_config = {}
+        globals_elements = root.getElementsByTagName('globals')
+        if len(globals_elements) > 0:
+            globals_element = globals_elements[0]
+            # port
+            port_elements = globals_element.getElementsByTagName('port')
+            if (len(port_elements) > 0) and (len(port_elements[0].childNodes) > 0) \
+                    and hasattr(port_elements[0].childNodes[0], 'data'):
+                port = port_elements[0].childNodes[0].data
+                if len(port.strip()) == 0:
+                    raise InvalidConfigException('The value of port can\'t be blank.')
+                elif re.match('^[1-9][0-9]*$', port.strip()) is None:
+                    raise InvalidConfigException('The value of port must be a number.')
+                globals_config['port'] = int(port.strip())
+            # username
+            username_elements = globals_element.getElementsByTagName('username')
+            if (len(username_elements) > 0) and (len(username_elements[0].childNodes) > 0) \
+                    and hasattr(username_elements[0].childNodes[0], 'data'):
+                username = username_elements[0].childNodes[0].data
+                if len(username.strip()) == 0:
+                    raise InvalidConfigException('The value of username can\'t be blank.')
+                globals_config['username'] = username.strip()
+            # password
+            password_elements = globals_element.getElementsByTagName('password')
+            if (len(password_elements) > 0) and (len(password_elements[0].childNodes) > 0) \
+                    and hasattr(password_elements[0].childNodes[0], 'data'):
+                password = password_elements[0].childNodes[0].data
+                if len(password.strip()) == 0:
+                    raise InvalidConfigException('The value of password can\'t be blank.')
+                globals_config['password'] = password.strip()
+            # timeout
+            timeout_elements = globals_element.getElementsByTagName('timeout')
+            if (len(timeout_elements) > 0) and (len(timeout_elements[0].childNodes) > 0) \
+                    and hasattr(timeout_elements[0].childNodes[0], 'data'):
+                timeout = timeout_elements[0].childNodes[0].data
+                if len(timeout.strip()) == 0:
+                    raise InvalidConfigException('The value of timeout can\'t be blank.')
+                elif re.match('^[0-9]+(\\.[0-9]+)?$', timeout.strip()) is None:
+                    raise InvalidConfigException('The value of port must be a float.')
+                globals_config['timeout'] = float(timeout.strip())
+            # props
+            props_elements = globals_element.getElementsByTagName('props')
+            if len(props_elements) > 0:
+                props = {}
+                prop_elements = props_elements[0].getElementsByTagName('prop')
+                for prop in prop_elements:
+                    name = prop.getAttribute('name')
+                    if (name is None) or (len(name) == 0):
+                        raise InvalidConfigException('The name of prop must be specified.')
+                    if (len(prop.childNodes) > 0) and hasattr(prop.childNodes[0], 'data'):
+                        value = prop.childNodes[0].data
+                    elif prop.hasAttribute('value'):
+                        value = prop.getAttribute('value')
+                    else:
+                        raise InvalidConfigException('The value of prop "%s" must be specified.' % name)
+                    props[name] = value
+                globals_config['props'] = props
+        # hosts
         hosts = root.getElementsByTagName('host')
         self._host_configs = []
         for host in hosts:
@@ -117,6 +176,8 @@ class HostConfigLoader:
                 elif re.match('^[1-9][0-9]*$', port.strip()) is None:
                     raise InvalidConfigException('The value of port must be a number.')
                 host_config.set_port(int(port.strip()))
+            elif 'port' in globals_config:
+                host_config.set_port(globals_config['port'])
             # username
             username_elements = host.getElementsByTagName('username')
             if (len(username_elements) > 0) and (len(username_elements[0].childNodes) > 0) \
@@ -125,6 +186,8 @@ class HostConfigLoader:
                 if len(username.strip()) == 0:
                     raise InvalidConfigException('The value of username can\'t be blank.')
                 host_config.set_username(username.strip())
+            elif 'username' in globals_config:
+                host_config.set_username(globals_config['username'])
             else:
                 raise InvalidConfigException('username must be specified.')
             # password
@@ -135,6 +198,8 @@ class HostConfigLoader:
                 if len(password.strip()) == 0:
                     raise InvalidConfigException('The value of password can\'t be blank.')
                 host_config.set_password(password.strip())
+            elif 'password' in globals_config:
+                host_config.set_password(globals_config['password'])
             else:
                 raise InvalidConfigException('password must be specified.')
             # timeout
@@ -147,6 +212,8 @@ class HostConfigLoader:
                 elif re.match('^[0-9]+(\\.[0-9]+)?$', timeout.strip()) is None:
                     raise InvalidConfigException('The value of port must be a float.')
                 host_config.set_timeout(float(timeout.strip()))
+            elif 'timeout' in globals_config:
+                host_config.set_timeout(globals_config['timeout'])
             # props
             props_elements = host.getElementsByTagName('props')
             if len(props_elements) > 0:
@@ -162,4 +229,9 @@ class HostConfigLoader:
                     else:
                         raise InvalidConfigException('The value of prop "%s" must be specified.' % name)
                     host_config.put_prop(name, value)
+            if 'props' in globals_config:
+                host_props = host_config.get_all_props()
+                for key, value in globals_config['props'].items():
+                    if key not in host_props:
+                        host_config.put_prop(key, value)
             self._host_configs.append(host_config)

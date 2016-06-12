@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from commons.config import InvalidConfigException
-from logcat import LogCat
+from logcat import Logcat
 
 
 class BusyBox(object):
@@ -12,7 +12,7 @@ class BusyBox(object):
             raise ValueError('host_config can\'t be None.')
         else:
             self._host_config = host_config
-            self._logcat = LogCat(host_config)
+            self._logcat = Logcat(host_config)
 
     def exec_task(self, task_id, args):
         if (task_id is None) or (len(task_id) == 0):

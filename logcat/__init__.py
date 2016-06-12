@@ -4,7 +4,7 @@
 import datetime
 from commons.config import HostConfigLoader, InvalidConfigException
 from commons.lang import StringUtils
-from logcat import LogCat
+from logcat import Logcat
 from busybox import BusyBox
 import os
 import re
@@ -18,7 +18,7 @@ def logcat():
     # Print usage
     if len(argv) < 3:
         print('Usage: ' + file_name +
-              ' APP_ID(Default|your_app_id) WORKING_DIRECTORY COMMAND [OUTPUT(Console|FILE_PATH) LINE_SIZE]')
+              ' APP_ID(Default|your_app_id) WORKING_DIRECTORY COMMAND [OUTPUT(.|FILE_PATH) LINE_SIZE]')
         sys.exit(0)
     # Check configuration file
     app_id = argv[0]
@@ -50,12 +50,18 @@ def logcat():
     output_file = None
     if len(argv) > 3:
         if StringUtils.is_blank(argv[3]):
-            print('The value of OUTPUT can\'t be blank.')
+            print('The path of OUTPUT can\'t be blank.')
             return -1
-        if not StringUtils.equals_ignore_case(argv[3].strip(), 'Console'):
+        if not StringUtils.equals_ignore_case(argv[3].strip(), '.'):
             output_file = argv[3].strip()
             if not os.path.isabs(output_file):
                 output_file = os.path.abspath(output_file)
+            if os.path.exists(output_file) and os.path.isdir(output_file):
+                print('The path of OUTPUT can\'t be a directory.')
+                return -1
+            parent_dir = os.path.dirname(output_file)
+            if not os.path.exists(parent_dir):
+                os.mkdir(parent_dir)
     # Check line size
     size = None
     if len(argv) > 4:
@@ -64,7 +70,7 @@ def logcat():
             print('The value of LINE_SIZE can\'t be blank.')
             return -1
         size_v = size_v.strip()
-        if not size_v.isdigit():
+        if re.match('^-?[1-9]\d*|0$', size_v) is None:
             print('The value of LINE_SIZE must be an integer.')
             return -1
         size = int(size_v)
@@ -81,9 +87,9 @@ def logcat():
         return -1
     host_configs = host_config_loader.get_host_configs()
     for host_config in host_configs:
-        log_cat = LogCat(host_config)
+        lc = Logcat(host_config)
         print('Execute command \'%s\' in path \'%s\' at server %s...' % (cmd, wk_dir, host_config.get_ip_address()))
-        log_cat.exec_cmd(wk_dir, cmd, output_file, size)
+        lc.exec_cmd(wk_dir, cmd, output_file, size)
     return 0
 
 
