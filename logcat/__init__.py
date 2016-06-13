@@ -6,6 +6,7 @@ from commons.config import HostConfigLoader, InvalidConfigException
 from commons.lang import StringUtils
 from logcat import Logcat
 from busybox import BusyBox
+import errno
 import os
 import re
 import sys
@@ -61,7 +62,17 @@ def logcat():
                 return -1
             parent_dir = os.path.dirname(output_file)
             if not os.path.exists(parent_dir):
-                os.mkdir(parent_dir)
+                try:
+                    os.makedirs(parent_dir)
+                except OSError as e:  # Python >2.5 (except OSError, exc: for Python <2.5)
+                    if e.errno == errno.EEXIST and os.path.isdir(parent_dir):
+                        pass
+                    else:
+                        print('Errors while creating folders: %s' % e.filename)
+                        return -1
+            elif os.path.isfile(parent_dir):
+                print('Can\'t create file: %s' % output_file)
+                return -1
     # Check line size
     size = None
     if len(argv) > 4:
