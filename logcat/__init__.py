@@ -8,6 +8,7 @@ from logcat import Logcat
 from busybox import BusyBox
 import errno
 import os
+import platform
 import re
 import sys
 import time
@@ -46,7 +47,10 @@ def logcat():
     if StringUtils.is_blank(cmd):
         print('The value of COMMAND can\'t be blank.')
         return -1
-    cmd = _decode_argv(cmd.strip())
+    cmd = cmd.strip()
+    # Support for Chinese
+    if platform.system() == 'Windows':
+        cmd = _decode_argv_win32(cmd)
     # Check output file
     output_file = None
     if len(argv) > 3:
@@ -135,9 +139,10 @@ def busybox():
     args = None
     if len(argv) > 2:
         args = argv[2:]
-        # Decode the arguments
-        for i in range(0, len(args)):
-            args[i] = _decode_argv(args[i])
+        # Support for Chinese
+        if platform.system() == 'Windows':
+            for i in range(0, len(args)):
+                args[i] = _decode_argv_win32(args[i])
     # Load the configuration file for hosts
     try:
         host_config_loader = HostConfigLoader(config_file)
@@ -155,7 +160,7 @@ def busybox():
     return 0
 
 
-def _decode_argv(s):
+def _decode_argv_win32(s):
     if sys.getdefaultencoding() == 'ascii':
         # Chinese Simplified (GB2312/GBK/gb18030)
         if re.search('[\\xa1-\\xfe]{2}', s):
